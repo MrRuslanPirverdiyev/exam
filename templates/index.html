@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Главная - Викторина{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <h1 class="text-center mb-4">Прогноз погоды</h1>
+        
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="city" class="form-label">Введите название города:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="city" name="city" 
+                                   placeholder="Например: Москва" required
+                                   value="{{ city if city else '' }}">
+                            <button type="submit" class="btn btn-primary">Получить прогноз</button>
+                        </div>
+                    </div>
+                </form>
+
+                {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+
+                {% if weather_data %}
+                    <h3 class="mt-4 mb-3">Прогноз для города: {{ city }}</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered weather-table">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>День недели</th>
+                                    <th>Дата</th>
+                                    <th>Температура днем (°C)</th>
+                                    <th>Температура ночью (°C)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for day in weather_data %}
+                                <tr>
+                                    <td>{{ day.day }}</td>
+                                    <td>{{ day.date }}</td>
+                                    <td>{{ day.temp_day }}°C</td>
+                                    <td>{{ day.temp_night }}°C</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if not current_user.is_authenticated %}
+        <div class="alert alert-info mt-4 text-center">
+            <h5>Добро пожаловать!</h5>
+            <p>Хотите проверить свои знания? <a href="{{ url_for('register') }}" class="alert-link">Зарегистрируйтесь</a> 
+            или <a href="{{ url_for('login') }}" class="alert-link">войдите</a>, чтобы начать викторину!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

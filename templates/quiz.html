@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Викторина{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="text-center mb-4">
+            <h1>Викторина</h1>
+            <h3>Ваш общий счет: <span id="total-score" class="badge bg-success">{{ current_user.total_score }}</span></h3>
+        </div>
+        
+        {% if question %}
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-4">{{ question.question_text }}</h4>
+                
+                <form id="quiz-form">
+                    <input type="hidden" name="question_id" value="{{ question.id }}">
+                    
+                    <div class="list-group">
+                        <button type="button" class="list-group-item list-group-item-action quiz-option" 
+                                data-answer="1">
+                            <strong>1.</strong> {{ question.option1 }}
+                        </button>
+                        <button type="button" class="list-group-item list-group-item-action quiz-option" 
+                                data-answer="2">
+                            <strong>2.</strong> {{ question.option2 }}
+                        </button>
+                        <button type="button" class="list-group-item list-group-item-action quiz-option" 
+                                data-answer="3">
+                            <strong>3.</strong> {{ question.option3 }}
+                        </button>
+                        <button type="button" class="list-group-item list-group-item-action quiz-option" 
+                                data-answer="4">
+                            <strong>4.</strong> {{ question.option4 }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div id="result-message" class="mt-3" style="display: none;"></div>
+        
+        <div class="text-center mt-4">
+            <button id="next-question" class="btn btn-primary btn-lg" style="display: none;">
+                Следующий вопрос
+            </button>
+        </div>
+        {% else %}
+        <div class="alert alert-warning text-center">
+            <h4>Вопросы пока не добавлены</h4>
+            <p>Администратор скоро добавит вопросы для викторины</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const options = document.querySelectorAll('.quiz-option');
+    const resultMessage = document.getElementById('result-message');
+    const nextButton = document.getElementById('next-question');
+    const totalScoreElement = document.getElementById('total-score');
+    const questionId = document.querySelector('input[name="question_id"]').value;
+    
+    options.forEach(option => {
+        option.addEventListener('click', function() {
+            // Отключаем все кнопки после ответа
+            options.forEach(btn => btn.disabled = true);
+            
+            const answer = this.dataset.answer;
+            
+            // Отправляем ответ
+            fetch('{{ url_for("quiz") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `question_id=${questionId}&answer=${answer}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Показываем результат
+                if (data.result === 'correct') {
+                    resultMessage.className = 'alert alert-success';
+                    resultMessage.innerHTML = '<h4>✓ Правильно!</h4><p>Вы получили 1 балл</p>';
+                    this.classList.add('list-group-item-success');
+                } else {
+                    resultMessage.className = 'alert alert-danger';
+                    resultMessage.innerHTML = '<h4>✗ Неправильно</h4><p>Попробуйте еще раз!</p>';
+                    this.classList.add('list-group-item-danger');
+                }
+                
+                resultMessage.style.display = 'block';
+                nextButton.style.display = 'inline-block';
+                
+                // Обновляем счет
+                totalScoreElement.textContent = data.new_score;
+            });
+        });
+    });
+    
+    nextButton.addEventListener('click', function() {
+        window.location.reload();
+    });
+});
+</script>
+{% endblock %}
+

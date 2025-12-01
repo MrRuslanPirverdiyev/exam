@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация - Викторина{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <h1 class="text-center mb-4">Регистрация</h1>
+        
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Логин:</label>
+                        <input type="text" class="form-control" id="username" name="username" 
+                               required minlength="3" maxlength="80">
+                        <div class="form-text">Логин должен быть уникальным</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Пароль:</label>
+                        <input type="password" class="form-control" id="password" name="password" 
+                               required minlength="4">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password_confirm" class="form-label">Подтверждение пароля:</label>
+                        <input type="password" class="form-control" id="password_confirm" 
+                               name="password_confirm" required minlength="4">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="display_name" class="form-label">Показываемое имя:</label>
+                        <input type="text" class="form-control" id="display_name" name="display_name" 
+                               required maxlength="80">
+                        <div class="form-text">Имя должно быть уникальным</div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Зарегистрироваться</button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-3">
+                    <p>Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
